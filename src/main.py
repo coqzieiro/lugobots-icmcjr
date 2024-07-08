@@ -1,5 +1,5 @@
 from my_bot import MyBot
-from lugo4py import NewDefaultStarter
+from lugo4py import NewDefaultStarter 
 
 if __name__ == "__main__":
     #################################################################################
