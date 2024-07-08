@@ -8,23 +8,6 @@ import math
 MAPPER_COLS = 10
 MAPPER_ROWS = 6
 
-
-
-# Example how to create your custom initial positions
-# PLAYER_INITIAL_POSITIONS = {
-#     1: {'Col': 0, 'Row': 0},
-#     2: {'Col': 1, 'Row': 1},
-#     3: {'Col': 2, 'Row': 2},
-#     4: {'Col': 2, 'Row': 3},
-#     5: {'Col': 1, 'Row': 4},
-#     6: {'Col': 3, 'Row': 1},
-#     7: {'Col': 3, 'Row': 2},
-#     8: {'Col': 3, 'Row': 3},
-#     9: {'Col': 3, 'Row': 4},
-#     10: {'Col': 4, 'Row': 3},
-#     11: {'Col': 4, 'Row': 2},
-# }
-
 def get_my_expected_position(inspector: lugo4py.GameSnapshotInspector, my_mapper: mapper.Mapper, number: int):
     mapper_cols = MAPPER_COLS
 
@@ -68,13 +51,13 @@ def get_my_expected_position(inspector: lugo4py.GameSnapshotInspector, my_mapper
     }
 
     ball_region = my_mapper.get_region_from_point(inspector.get_ball().position)
-    field_third = mapper_cols / 3
+    field_middle = mapper_cols / 3
     ball_cols = ball_region.get_col()
 
     team_state = "OFFENSIVE"
-    if ball_cols < field_third:
+    if ball_cols < field_middle*2:
         team_state = "DEFENSIVE"
-    elif ball_cols < field_third * 2:
+    elif ball_cols < field_middle:
         team_state = "NORMAL"
 
     expected_region = my_mapper.get_region(player_tactic_positions[team_state][number]['Col'],
@@ -99,9 +82,8 @@ def get_closestenemy_dist(inspector: lugo4py.GameSnapshotInspector, my_mapper: m
 
     return minDistance, nearesopponent
 
-
 def getDistance(x1,y1, x2, y2):
-    distance = (x1-x2)**2 + (y1-y2)**2
+    distance = math.sqrt((x1-x2)**2 + (y1-y2)**2)
     return distance
 
 def get_closestally_position(inspector: lugo4py.GameSnapshotInspector, my_mapper: mapper.Mapper):
@@ -137,7 +119,7 @@ def has_other_closest(inspector: lugo4py.GameSnapshotInspector, player_me):
     for player in players:
         if getDistance(player.position.x, player.position.y, ball_position.x, ball_position.y) > getDistance(player_me.position.x, player_me.position.y, ball_position.x, ball_position.y) and player_me.number != 1:
             counter +=1
-    if counter >= 8:
+    if counter >= 5:
         return False
     else:
         return True

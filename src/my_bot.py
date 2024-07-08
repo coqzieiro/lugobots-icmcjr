@@ -89,56 +89,58 @@ class MyBot(lugo4py.Bot, ABC):  # Define a classe MyBot, que herda de lugo4py.Bo
                     goalkeeper = inspector.get_opponent_players()[0]  # Obtém o goleiro adversário
                     if (enemy_goal.x == 20000):  # Se o gol adversário estiver à direita
                         if (goalkeeper.position.y < 5000):  # Se o goleiro estiver abaixo do centro
-                            target = Point(20000, 6200)  # Define um ponto alvo acima do centro
+                            target = Point(20000, 6500)  # Define um ponto alvo acima do centro
                             kick_order = inspector.make_order_kick_max_speed(target)  # Adiciona um pedido para chutar a bola na velocidade máxima para o ponto alvo
                         elif (goalkeeper.position.y > 5000):  # Se o goleiro estiver acima do centro
-                            target = Point(20000, 3800)  # Define um ponto alvo abaixo do centro
+                            target = Point(20000, 3500)  # Define um ponto alvo abaixo do centro
                             kick_order = inspector.make_order_kick_max_speed(target)  # Adiciona um pedido para chutar a bola na velocidade máxima para o ponto alvo
                         else:  # Se o goleiro estiver no centro
-                            target = Point(20000, 6200)  # Define um ponto alvo acima do centro
+                            target = Point(20000, 6500)  # Define um ponto alvo acima do centro
                             kick_order = inspector.make_order_kick_max_speed(target)  # Adiciona um pedido para chutar a bola na velocidade máxima para o ponto alvo
                     else:  # Se o gol adversário estiver à esquerda
                         if (goalkeeper.position.y < 5000):  # Se o goleiro estiver abaixo do centro
-                            target = Point(0, 6200)  # Define um ponto alvo acima do centro
+                            target = Point(0, 6500)  # Define um ponto alvo acima do centro
                             kick_order = inspector.make_order_kick_max_speed(target)  # Adiciona um pedido para chutar a bola na velocidade máxima para o ponto alvo
                         elif (goalkeeper.position.y > 5000):  # Se o goleiro estiver acima do centro
-                            target = Point(0, 3800)  # Define um ponto alvo abaixo do centro
+                            target = Point(0, 3500)  # Define um ponto alvo abaixo do centro
                             kick_order = inspector.make_order_kick_max_speed(target)  # Adiciona um pedido para chutar a bola na velocidade máxima para o ponto alvo
                         else:  # Se o goleiro estiver no centro
-                            target = Point(0, 6200)  # Define um ponto alvo acima do centro
+                            target = Point(0, 6500)  # Define um ponto alvo acima do centro
                             kick_order = inspector.make_order_kick_max_speed(target)  # Adiciona um pedido para chutar a bola na velocidade máxima para o ponto alvo
 
                     order_list.append(kick_order)  # Adiciona o pedido de chute à lista de pedidos
 
                 else:  # Caso contrário
-                    if (closest_oponnentdis < 800000):  # Se houver um oponente perto
+                    if (closest_oponnentdis < 800):  # Se houver um oponente perto
                         ord_ally_posi = get_closestally_position(inspector, my_region)  # Obtém a posição dos aliados mais próximos
 
                         # Percorre os aliados mais próximos e passa para o mais avançado
                         pass_order = None
-                        minimun_distance = 800000
+                        minimun_distance = 800
                         for ally_list in ord_ally_posi.values():
                             counter = 0
                             for ally in ally_list:
                                 counter += 1
                                 if (enemy_goal.x == 20000):
-                                    if ally.position.x > me.x and getDistance(me.x, me.y, ally.position.x, ally.position.y) > minimun_distance:
+                                    if ally.position.x > me.x: # Se o aliado está na minha frente
                                         pass_order = inspector.make_order_kick_max_speed(ally.position)
+                                        order_list.append(pass_order)
                                         break
                                 elif (enemy_goal.x == 0):
-                                    if ally.position.x < me.x and getDistance(me.x, me.y, ally.position.x, ally.position.y) > minimun_distance:
+                                    if ally.position.x < me.x: # Se o aliado está na minha frente
                                         pass_order = inspector.make_order_kick_max_speed(ally.position)
+                                        order_list.append(pass_order)
                                         break
                                 if counter == 5:
                                     break
 
                         if pass_order is None:
-                            # Percorre os aliados mais próximos novamente para encontrar o primeiro que esteja com uma distância maior que 10000
+                            # Percorre os aliados mais próximos novamente para encontrar o primeiro que esteja com uma distância maior que 1000
                             for ally_list in ord_ally_posi.values():
                                 for ally in ally_list:
-                                    if getDistance(me.x, me.y, ally.position.x, ally.position.y) > minimun_distance and ally.number != 0:
-                                        move_order = inspector.make_order_move_max_speed(ally.position)
-                                        pass_order = inspector.make_order_kick_max_speed(ally.position)
+                                    if getDistance(me.x, me.y, closest_oponnent.position.x, closest_oponnent.position.y) > minimun_distance and ally.number != 0:
+                                        move_order = inspector.make_order_move_max_speed(enemy_goal.position) # Se move em direção ao ataque
+                                        pass_order = inspector.make_order_kick_max_speed(ally.position) # Passa a bola para o aliado
                                         order_list.append(move_order)
                                         order_list.append(pass_order)
                                         break
@@ -150,12 +152,12 @@ class MyBot(lugo4py.Bot, ABC):  # Define a classe MyBot, que herda de lugo4py.Bo
                             enemy_goal = opponent_goal_point.get_center()
                             if (enemy_goal.x == 20000):
                                 x = randint(me.x + 1, 20000)
-                                y = randint(3500,6500)
+                                y = randint(3600,6300)
                                 target = Point(x, y)
                                 pass_order = inspector.make_order_kick(target, 250)
                             else:
                                 x = randint(0, me.x - 1)
-                                y = randint(3500,6500)
+                                y = randint(3600,6300)
                                 target = Point(x, y)
                                 pass_order = inspector.make_order_kick(target, 250)
 
@@ -200,10 +202,10 @@ class MyBot(lugo4py.Bot, ABC):  # Define a classe MyBot, que herda de lugo4py.Bo
                 first_ally_position = list(closest_allypos.values())[0][0].position  # Obtém a posição do primeiro aliado mais próximo
                 pass_order = None  # Inicializa um pedido de passe como None
                 if (enemy_goal.x == 20000):  # Se o gol adversário estiver à direita
-                    target = Point(1221, 414)  # Define um ponto alvo
+                    target = Point(0, 450)  # Define um ponto alvo
                     pass_order = inspector.make_order_kick_max_speed(target)  # Adiciona um pedido para chutar a bola na velocidade máxima para o ponto alvo
                 else:  # Se o gol adversário estiver à esquerda
-                    target = Point(18773, 414)  # Define um ponto alvo
+                    target = Point(20000, 450)  # Define um ponto alvo
                     pass_order = inspector.make_order_kick_max_speed(target)  # Adiciona um pedido para chutar a bola na velocidade máxima para o ponto alvo
 
                 order_list.append(pass_order)  # Adiciona o pedido de passe à lista de pedidos
