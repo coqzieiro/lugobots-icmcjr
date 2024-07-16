@@ -2,7 +2,7 @@
 #
 # This file is compatible with Lugo Studio.
 # If you change it, you may make it incompatible or Lugo Studio may not work correctly.
-version: '3.9'
+version: '3.8'
 services:
   game_server:
     image: lugobots/server:${SERVER_VERSION:-latest}

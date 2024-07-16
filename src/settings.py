@@ -13,40 +13,52 @@ def get_my_expected_position(inspector: lugo4py.GameSnapshotInspector, my_mapper
 
     player_tactic_positions = {
         'DEFENSIVE': {
-            2: {'Col': 0, 'Row': 2},
-            3: {'Col': 1, 'Row': 1},
-            4: {'Col': 1, 'Row': 4},
-            5: {'Col': 0, 'Row': 3},
-            6: {'Col': 2, 'Row': 2},
-            7: {'Col': 1, 'Row': 2},
-            8: {'Col': 1, 'Row': 3},
-            9: {'Col': 2, 'Row': 3},
+            2: {'Col': 1, 'Row': 2},
+            3: {'Col': 2, 'Row': 1},
+            4: {'Col': 2, 'Row': 4},
+            5: {'Col': 1, 'Row': 3},
+            6: {'Col': 3, 'Row': 2},
+            7: {'Col': 2, 'Row': 2},
+            8: {'Col': 2, 'Row': 3},
+            9: {'Col': 3, 'Row': 3},
             10: {'Col': 4, 'Row': 4},
-            11: {'Col': 6, 'Row': 1},
+            11: {'Col': 5, 'Row': 1},
         },
         'NORMAL': {
-            2: {'Col':1, 'Row': 2},
-            3: {'Col': 3, 'Row': 2},
-            4: {'Col': 3, 'Row': 3},
-            5: {'Col': 1, 'Row': 3},
-            6: {'Col': 4, 'Row': 1},
-            7: {'Col': 4, 'Row': 2},
-            8: {'Col': 4, 'Row': 3},
-            9: {'Col': 4, 'Row': 4},
-            10: {'Col': 5, 'Row': 3},
-            11: {'Col': 6, 'Row': 1},
+            2: {'Col': 2, 'Row': 2},
+            3: {'Col': 4, 'Row': 2},
+            4: {'Col': 4, 'Row': 3},
+            5: {'Col': 2, 'Row': 3},
+            6: {'Col': 5, 'Row': 1},
+            7: {'Col': 5, 'Row': 2},
+            8: {'Col': 5, 'Row': 3},
+            9: {'Col': 5, 'Row': 4},
+            10: {'Col': 6, 'Row': 3},
+            11: {'Col': 7, 'Row': 1},
         },
         'OFFENSIVE': {
-            2: {'Col': 3, 'Row': 2},
-            3: {'Col': 5, 'Row': 2},
-            4: {'Col': 5, 'Row': 3},
-            5: {'Col': 3, 'Row': 3},
-            6: {'Col': 6, 'Row': 1},
-            7: {'Col': 6, 'Row': 2},
-            8: {'Col': 8, 'Row': 3},
-            9: {'Col': 6, 'Row': 4},
+            2: {'Col': 4, 'Row': 2},
+            3: {'Col': 6, 'Row': 2},
+            4: {'Col': 6, 'Row': 3},
+            5: {'Col': 4, 'Row': 3},
+            6: {'Col': 7, 'Row': 1},
+            7: {'Col': 7, 'Row': 2},
+            8: {'Col': 9, 'Row': 3},
+            9: {'Col': 7, 'Row': 4},
             10: {'Col': 9, 'Row': 4},
             11: {'Col': 9, 'Row': 1},
+        },
+        'ATTACK': {
+            2: {'Col': 5, 'Row': 2},
+            3: {'Col': 7, 'Row': 2},
+            4: {'Col': 7, 'Row': 3},
+            5: {'Col': 5, 'Row': 3},
+            6: {'Col': 8, 'Row': 1},
+            7: {'Col': 8, 'Row': 2},
+            8: {'Col': 10, 'Row': 3},
+            9: {'Col': 8, 'Row': 4},
+            10: {'Col': 10, 'Row': 4},
+            11: {'Col': 10, 'Row': 1},
         }
     }
 
@@ -60,6 +72,8 @@ def get_my_expected_position(inspector: lugo4py.GameSnapshotInspector, my_mapper
         team_state = "DEFENSIVE"
     elif ball_cols < 6:
         team_state = "NORMAL"
+    elif ball_holder is not None and ball_holder.get_team_side() == inspector.get_my_team().side:
+        team_state = "ATTACK"
 
     expected_region = my_mapper.get_region(
         player_tactic_positions[team_state][number]['Col'],
