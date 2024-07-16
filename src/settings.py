@@ -13,88 +13,90 @@ def get_my_expected_position(inspector: lugo4py.GameSnapshotInspector, my_mapper
 
     player_tactic_positions = {
         'DEFENSIVE': {
-            2: {'Col': 1, 'Row': 1},
-            3: {'Col': 2, 'Row': 2},
-            4: {'Col': 2, 'Row': 3},
-            5: {'Col': 1, 'Row': 4},
-            6: {'Col': 3, 'Row': 1},
-            7: {'Col': 3, 'Row': 2},
-            8: {'Col': 3, 'Row': 3},
-            9: {'Col': 3, 'Row': 4},
-            10: {'Col': 4, 'Row': 3},
-            11: {'Col': 4, 'Row': 2},
+            2: {'Col': 0, 'Row': 2},
+            3: {'Col': 1, 'Row': 1},
+            4: {'Col': 1, 'Row': 4},
+            5: {'Col': 0, 'Row': 3},
+            6: {'Col': 2, 'Row': 2},
+            7: {'Col': 1, 'Row': 2},
+            8: {'Col': 1, 'Row': 3},
+            9: {'Col': 2, 'Row': 3},
+            10: {'Col': 4, 'Row': 4},
+            11: {'Col': 6, 'Row': 1},
         },
         'NORMAL': {
-            2: {'Col': 2, 'Row': 1},
-            3: {'Col': 4, 'Row': 2},
-            4: {'Col': 4, 'Row': 3},
-            5: {'Col': 2, 'Row': 4},
-            6: {'Col': 6, 'Row': 1},
-            7: {'Col': 8, 'Row': 2},
-            8: {'Col': 8, 'Row': 3},
-            9: {'Col': 6, 'Row': 4},
-            10: {'Col': 7, 'Row': 4},
-            11: {'Col': 7, 'Row': 1},
+            2: {'Col':1, 'Row': 2},
+            3: {'Col': 3, 'Row': 2},
+            4: {'Col': 3, 'Row': 3},
+            5: {'Col': 1, 'Row': 3},
+            6: {'Col': 4, 'Row': 1},
+            7: {'Col': 4, 'Row': 2},
+            8: {'Col': 4, 'Row': 3},
+            9: {'Col': 4, 'Row': 4},
+            10: {'Col': 5, 'Row': 3},
+            11: {'Col': 6, 'Row': 1},
         },
         'OFFENSIVE': {
-            2: {'Col': 3, 'Row': 1},
+            2: {'Col': 3, 'Row': 2},
             3: {'Col': 5, 'Row': 2},
             4: {'Col': 5, 'Row': 3},
-            5: {'Col': 3, 'Row': 4},
-            6: {'Col': 7, 'Row': 1},
-            7: {'Col': 8, 'Row': 2},
+            5: {'Col': 3, 'Row': 3},
+            6: {'Col': 6, 'Row': 1},
+            7: {'Col': 6, 'Row': 2},
             8: {'Col': 8, 'Row': 3},
-            9: {'Col': 7, 'Row': 4},
-            10: {'Col': 9, 'Row': 3},
-            11: {'Col': 9, 'Row': 2},
+            9: {'Col': 6, 'Row': 4},
+            10: {'Col': 9, 'Row': 4},
+            11: {'Col': 9, 'Row': 1},
         }
     }
 
     ball_region = my_mapper.get_region_from_point(inspector.get_ball().position)
-    field_middle = mapper_cols / 3
     ball_cols = ball_region.get_col()
 
+    ball_holder = inspector.get_ball().holder
     team_state = "OFFENSIVE"
-    if ball_cols < field_middle*2:
+
+    if ball_cols < 4 or (ball_holder is not None and ball_holder.get_team_side() != inspector.get_my_team().side):
         team_state = "DEFENSIVE"
-    elif ball_cols < field_middle:
+    elif ball_cols < 6:
         team_state = "NORMAL"
 
-    expected_region = my_mapper.get_region(player_tactic_positions[team_state][number]['Col'],
-                                           player_tactic_positions[team_state][number]['Row'])
+    expected_region = my_mapper.get_region(
+        player_tactic_positions[team_state][number]['Col'],
+        player_tactic_positions[team_state][number]['Row']
+    )
     return expected_region.get_center()
 
-
 def get_distance(r1: mapper.Region, r2: mapper.Region):
-    return math.sqrt((r2.get_col() - r1.get_col())**2 + (r2.get_row() - r1.get_row())**2)
+    return math.sqrt((r2.get_col() - r1.get_col())**2 + (r1.get_row() - r2.get_row())**2)
 
-def get_closestenemy_dist(inspector: lugo4py.GameSnapshotInspector, my_mapper: mapper.Mapper):
+def get_closest_enemy_dist(inspector: lugo4py.GameSnapshotInspector, my_mapper: mapper.Mapper):
     player_position = inspector.get_ball().position
-    oponentes = inspector.get_opponent_players()
+    opponents = inspector.get_opponent_players()
 
-    nearesopponent = math.inf
-    minDistance = math.inf
-    for opponent in oponentes:
-        current_distance = getDistance(player_position.x, player_position.y, opponent.position.x, opponent.position.y)
-        if (current_distance < minDistance):
-            minDistance = current_distance
-            nearesopponent = opponent
+    nearest_opponent = None
+    min_distance = math.inf
+    for opponent in opponents:
+        current_distance = get_distance_between_points(player_position.x, player_position.y, opponent.position.x, opponent.position.y)
+        if current_distance < min_distance:
+            min_distance = current_distance
+            nearest_opponent = opponent
 
-    return minDistance, nearesopponent
+    return min_distance, nearest_opponent
 
-def getDistance(x1,y1, x2, y2):
-    distance = math.sqrt((x1-x2)**2 + (y1-y2)**2)
+def get_distance_between_points(x1, y1, x2, y2):
+    distance = math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
     return distance
 
-def get_closestally_position(inspector: lugo4py.GameSnapshotInspector, my_mapper: mapper.Mapper):
+def get_closest_ally_position(inspector: lugo4py.GameSnapshotInspector, my_mapper: mapper.Mapper):
     player_list = inspector.get_my_team_players()
     player_position = inspector.get_ball().position
     holder_number = inspector.get_ball().holder.number
 
     closest_ally = {}
     for ally in player_list:
-        if ally.number != holder_number and (ally.number != 1):
-            distance = getDistance(ally.position.x, ally.position.y, player_position.x, player_position.y)
+        if ally.number != holder_number and ally.number != 1:
+            distance = get_distance_between_points(ally.position.x, ally.position.y, player_position.x, player_position.y)
             if distance not in closest_ally:
                 closest_ally[distance] = [ally]
             else:
@@ -117,9 +119,6 @@ def has_other_closest(inspector: lugo4py.GameSnapshotInspector, player_me):
     players = inspector.get_my_team_players()
     ball_position = inspector.get_ball().position
     for player in players:
-        if getDistance(player.position.x, player.position.y, ball_position.x, ball_position.y) > getDistance(player_me.position.x, player_me.position.y, ball_position.x, ball_position.y) and player_me.number != 1:
-            counter +=1
-    if counter >= 5:
-        return False
-    else:
-        return True
+        if get_distance_between_points(player.position.x, player.position.y, ball_position.x, ball_position.y) > get_distance_between_points(player_me.position.x, player_me.position.y, ball_position.x, ball_position.y) and player_me.number != 1:
+            counter += 1
+    return counter < 5

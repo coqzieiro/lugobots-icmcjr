@@ -3,7 +3,7 @@ from random import randint  # Importa a função randint do módulo random
 from abc import ABC  # Importa a classe ABC do módulo abc
 from typing import List  # Importa o tipo de dados List do módulo typing
 import lugo4py  # Importa o módulo lugo4py
-from settings import get_distance, get_closestenemy_dist, get_closestally_position, Point, get_my_expected_position, getDistance, has_other_closest  # Importa funções e classes do módulo settings
+from settings import get_distance, get_closest_enemy_dist, get_closest_ally_position, Point, get_my_expected_position, has_other_closest  # Importa funções e classes do módulo settings
 
 class MyBot(lugo4py.Bot, ABC):  # Define a classe MyBot, que herda de lugo4py.Bot e ABC
     def on_disputing(self, inspector: lugo4py.GameSnapshotInspector) -> List[lugo4py.Order]:  # Define um método on_disputing que retorna uma lista de objetos Order
@@ -82,7 +82,7 @@ class MyBot(lugo4py.Bot, ABC):  # Define a classe MyBot, que herda de lugo4py.Bo
                 my_region = self.mapper.get_region_from_point(me)  # Obtém a região do próprio jogador
 
                 # Se houver um oponente perto, ele deve passar a bola para um companheiro de equipe
-                closest_oponnentdis, closest_oponnent  = get_closestenemy_dist(inspector, my_region)
+                closest_oponnentdis, closest_oponnent  = get_closest_enemy_dist(inspector, my_region)
 
                 # Se estiver perto do gol adversário
                 if self.is_near(my_region, goal_region):
@@ -112,7 +112,7 @@ class MyBot(lugo4py.Bot, ABC):  # Define a classe MyBot, que herda de lugo4py.Bo
 
                 else:  # Caso contrário
                     if (closest_oponnentdis < 800):  # Se houver um oponente perto
-                        ord_ally_posi = get_closestally_position(inspector, my_region)  # Obtém a posição dos aliados mais próximos
+                        ord_ally_posi = get_closest_ally_position(inspector, my_region)  # Obtém a posição dos aliados mais próximos
 
                         # Percorre os aliados mais próximos e passa para o mais avançado
                         pass_order = None
@@ -138,7 +138,7 @@ class MyBot(lugo4py.Bot, ABC):  # Define a classe MyBot, que herda de lugo4py.Bo
                             # Percorre os aliados mais próximos novamente para encontrar o primeiro que esteja com uma distância maior que 1000
                             for ally_list in ord_ally_posi.values():
                                 for ally in ally_list:
-                                    if getDistance(me.x, me.y, closest_oponnent.position.x, closest_oponnent.position.y) > minimun_distance and ally.number != 0:
+                                    if get_distance(me.x, me.y, closest_oponnent.position.x, closest_oponnent.position.y) > minimun_distance and ally.number != 0:
                                         move_order = inspector.make_order_move_max_speed(enemy_goal.position) # Se move em direção ao ataque
                                         pass_order = inspector.make_order_kick_max_speed(ally.position) # Passa a bola para o aliado
                                         order_list.append(move_order)
@@ -198,7 +198,7 @@ class MyBot(lugo4py.Bot, ABC):  # Define a classe MyBot, que herda de lugo4py.Bo
                 position = ball_position  # A posição é a da bola
             elif state == lugo4py.PLAYER_STATE.HOLDING_THE_BALL:  # Se estiver com a bola
                 position = self.mapper.get_attack_goal().get_center()  # A posição é o centro do gol adversário
-                closest_allypos = get_closestally_position(inspector, my_region)  # Obtém a posição dos aliados mais próximos
+                closest_allypos = get_closest_ally_position(inspector, my_region)  # Obtém a posição dos aliados mais próximos
                 first_ally_position = list(closest_allypos.values())[0][0].position  # Obtém a posição do primeiro aliado mais próximo
                 pass_order = None  # Inicializa um pedido de passe como None
                 if (enemy_goal.x == 20000):  # Se o gol adversário estiver à direita
